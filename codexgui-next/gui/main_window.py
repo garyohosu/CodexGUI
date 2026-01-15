@@ -14,6 +14,7 @@ from PySide6.QtGui import QAction
 from gui.explorer_panel import ExplorerPanel
 from gui.chat_panel import ChatPanel
 from gui.detail_panel import DetailPanel
+from gui.settings_dialog import SettingsDialog
 from core.runner import LocalRunner, RunnerEvent, RunnerState
 
 
@@ -94,6 +95,13 @@ class MainWindow(QMainWindow):
         
         # File menu
         file_menu = menubar.addMenu("File")
+        
+        # Settings action
+        settings_action = QAction("Settings...", self)
+        settings_action.triggered.connect(self._on_settings_clicked)
+        file_menu.addAction(settings_action)
+        
+        file_menu.addSeparator()
         
         # Toggle details action
         self.toggle_details_action = QAction("Show Details", self)
@@ -254,6 +262,11 @@ class MainWindow(QMainWindow):
     def _on_toggle_details(self, checked: bool):
         """Toggle details panel visibility."""
         self.bottom_tabs.setVisible(checked)
+    
+    def _on_settings_clicked(self):
+        """Show settings dialog."""
+        dialog = SettingsDialog(self)
+        dialog.exec()
     
     def _on_about_clicked(self):
         """Show about dialog."""
