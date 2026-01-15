@@ -97,8 +97,15 @@ class CodexWrapper:
         """
         try:
             # Build command - Use 'exec' for non-interactive execution
-            # No additional flags - codex exec handles non-interactive by default
-            cmd = [self.codex_path, "exec", prompt]
+            # Add workspace-write sandbox permission for file operations
+            # Add never approval policy for non-interactive execution
+            cmd = [
+                self.codex_path, 
+                "exec",
+                "--sandbox", "workspace-write",  # Allow writing in workspace
+                "--ask-for-approval", "never",   # Don't prompt for approval (non-interactive)
+                prompt
+            ]
             
             # Set working directory
             cwd = working_dir or os.getcwd()
@@ -150,8 +157,15 @@ class CodexWrapper:
         """
         try:
             # Build command - Use 'exec' for non-interactive execution
-            # No additional flags - codex exec handles non-interactive by default
-            cmd = [self.codex_path, "exec", prompt]
+            # Add workspace-write sandbox permission for file operations
+            # Add never approval policy for non-interactive execution
+            cmd = [
+                self.codex_path, 
+                "exec",
+                "--sandbox", "workspace-write",  # Allow writing in workspace
+                "--ask-for-approval", "never",   # Don't prompt for approval (non-interactive)
+                prompt
+            ]
             cwd = working_dir or os.getcwd()
             
             process = subprocess.Popen(
