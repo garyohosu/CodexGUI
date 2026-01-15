@@ -96,14 +96,12 @@ class CodexWrapper:
             CodexResult containing execution results
         """
         try:
-            # Build command - Use 'exec' for non-interactive execution
-            # Add workspace-write sandbox permission for file operations
-            # Add never approval policy for non-interactive execution
+            # Build command - Use 'exec' with --yolo for full automation
+            # --yolo enables complete non-interactive execution without prompts
             cmd = [
                 self.codex_path, 
                 "exec",
-                "--sandbox", "workspace-write",  # Allow writing in workspace
-                "--ask-for-approval", "never",   # Don't prompt for approval (non-interactive)
+                "--yolo",  # Full automation mode (bypass all confirmations)
                 prompt
             ]
             
@@ -156,14 +154,12 @@ class CodexWrapper:
             callback: Callback function for streaming output (receives output line)
         """
         try:
-            # Build command - Use 'exec' for non-interactive execution
-            # Add workspace-write sandbox permission for file operations
-            # Add never approval policy for non-interactive execution
+            # Build command - Use 'exec' with --yolo for full automation
+            # --yolo enables complete non-interactive execution without prompts
             cmd = [
                 self.codex_path, 
                 "exec",
-                "--sandbox", "workspace-write",  # Allow writing in workspace
-                "--ask-for-approval", "never",   # Don't prompt for approval (non-interactive)
+                "--yolo",  # Full automation mode (bypass all confirmations)
                 prompt
             ]
             cwd = working_dir or os.getcwd()
