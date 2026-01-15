@@ -96,8 +96,9 @@ class CodexWrapper:
             CodexResult containing execution results
         """
         try:
-            # Build command - Codex CLI accepts prompt directly as argument
-            cmd = [self.codex_path, prompt]
+            # Build command - Use 'exec' for non-interactive execution
+            # --quiet/-q flag enables non-interactive mode
+            cmd = [self.codex_path, "exec", "--quiet", prompt]
             
             # Set working directory
             cwd = working_dir or os.getcwd()
@@ -148,8 +149,8 @@ class CodexWrapper:
             callback: Callback function for streaming output (receives output line)
         """
         try:
-            # Build command - Codex CLI accepts prompt directly as argument
-            cmd = [self.codex_path, prompt]
+            # Build command - Use 'exec' for non-interactive execution
+            cmd = [self.codex_path, "exec", "--quiet", prompt]
             cwd = working_dir or os.getcwd()
             
             process = subprocess.Popen(
@@ -161,10 +162,24 @@ class CodexWrapper:
                 bufsize=1
             )
             
-            # Stream stdout
+            # Stream stdout and stderr
             if callback:
-                for line in process.stdout:
-                    callback(line.rstrip())
+                # Read from both stdout and stderr
+                import select
+                import sys
+                
+                while True:
+                    # Read available lines
+                    line = process.stdout.readline()
+                    if line:
+                        callback(line.rstrip())
+                    
+                    # Check if process finished
+                    if process.poll() is not None:
+                        # Read remaining output
+                        for line in process.stdout:
+                            callback(line.rstrip())
+                        break
             
             # Wait for completion
             process.wait()
