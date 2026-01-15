@@ -1,0 +1,125 @@
+{
+  "app": {
+    "name": "CodexGUI",
+    "title": "CodexGUI - Codex CLI Wrapper",
+    "version": "v0.0.1"
+  },
+  "menu": {
+    "file": "&File",
+    "settings": "&Settings...",
+    "exit": "E&xit",
+    "language": "&Language",
+    "english": "English",
+    "japanese": "Japanese (日本語)",
+    "help": "&Help",
+    "about": "&About",
+    "codex_installation": "Codex CLI &Installation"
+  },
+  "task_panel": {
+    "task_selection": "Task Selection",
+    "template": "Template:",
+    "target_folder": "Target Folder",
+    "select_folder": "Select a folder...",
+    "browse": "Browse...",
+    "prompt": "Prompt",
+    "prompt_placeholder": "Enter your prompt here...",
+    "execute_task": "Execute Task"
+  },
+  "output_panel": {
+    "output": "Output",
+    "ready": "Ready",
+    "clear_output": "Clear Output",
+    "save_to_file": "Save to File"
+  },
+  "status": {
+    "ready": "Ready",
+    "executing": "Executing: {task}...",
+    "completed": "Execution completed successfully",
+    "failed": "Execution failed",
+    "completed_success": "✓ Completed successfully",
+    "execution_failed": "✗ Execution failed",
+    "codex_not_available": "Warning: Codex CLI not available",
+    "codex_updated": "Codex CLI path updated and verified",
+    "language_changed": "Language changed to: {language}"
+  },
+  "dialog": {
+    "missing_folder_title": "Missing Folder",
+    "missing_folder_text": "Please select a target folder.",
+    "missing_prompt_title": "Missing Prompt",
+    "missing_prompt_text": "Please enter a prompt.",
+    "execution_in_progress_title": "Execution in Progress",
+    "execution_in_progress_text": "A task is currently running. Are you sure you want to quit?",
+    "codex_not_found_title": "Codex CLI Not Found",
+    "codex_not_found_text": "Codex CLI is not available in your system.",
+    "codex_not_found_info": "The application will continue, but execution will fail.",
+    "codex_not_valid_title": "Codex CLI Not Found",
+    "codex_not_valid_text": "The specified Codex CLI path is not valid.\nPlease check the path and try again.",
+    "settings_updated_title": "Settings Updated",
+    "settings_updated_text": "Codex CLI configuration has been updated successfully.",
+    "about_title": "About CodexGUI",
+    "about_text": "<h3>CodexGUI v0.0.1</h3><p>A Qt/PySide6 GUI wrapper for OpenAI Codex CLI</p><p>Enables easy access to AI-powered code analysis, file organization, and task automation through an intuitive desktop interface.</p><p><b>Author:</b> garyohosu</p><p><b>GitHub:</b> <a href='https://github.com/garyohosu/CodexGUI'>https://github.com/garyohosu/CodexGUI</a></p>",
+    "codex_help_title": "Codex CLI Installation Help",
+    "codex_help_text": "How to install Codex CLI",
+    "restart_required_title": "Restart Required",
+    "restart_required_text": "Language change will take effect after restarting the application.\n\nDo you want to restart now?",
+    "restart_later_info": "You can restart the application later to apply the language change."
+  },
+  "settings": {
+    "title": "Settings",
+    "codex_config": "Codex CLI Configuration",
+    "codex_path": "Codex CLI Path:",
+    "codex_path_placeholder": "e.g., codex.exe or /path/to/codex",
+    "browse": "Browse...",
+    "help_text": "Leave empty for auto-detection. On Windows, use 'codex.exe' or full path to the executable.",
+    "browse_title": "Select Codex CLI Executable",
+    "browse_filter": "Executable Files (*.exe *.cmd);;All Files (*.*)",
+    "save_error_title": "Save Error",
+    "save_error_text": "Failed to save settings: {error}"
+  },
+  "codex": {
+    "install_help_windows": "Codex CLI is not installed or not in PATH.\n\nTo install Codex CLI on Windows:\n1. Visit: https://developers.openai.com/codex/cli\n2. Download the Windows installer\n3. Run the installer\n4. Restart this application\n\nExpected executable names: codex.exe, codex.cmd",
+    "install_help_unix": "Codex CLI is not installed or not in PATH.\n\nTo install Codex CLI:\n1. Visit: https://developers.openai.com/codex/cli\n2. Follow installation instructions\n3. Ensure 'codex' is in your PATH\n4. Restart this application"
+  },
+  "templates": {
+    "file_organization": {
+      "name": "File Organization",
+      "description": "Organize files in a folder by type and date"
+    },
+    "business_card_extraction": {
+      "name": "Business Card Data Extraction",
+      "description": "Extract information from business card images and create a spreadsheet"
+    },
+    "code_analysis": {
+      "name": "Code Analysis",
+      "description": "Analyze code structure and generate documentation"
+    },
+    "receipt_expense": {
+      "name": "Receipt to Expense Report",
+      "description": "Extract data from receipt images and create expense report"
+    },
+    "document_summary": {
+      "name": "Document Summary",
+      "description": "Summarize multiple documents into a single report"
+    },
+    "photo_organization": {
+      "name": "Photo Organization",
+      "description": "Organize photos by date and event"
+    },
+    "code_review": {
+      "name": "Code Review",
+      "description": "Review code and provide suggestions"
+    },
+    "data_cleanup": {
+      "name": "Data Cleanup",
+      "description": "Clean and standardize data files"
+    },
+    "meeting_notes": {
+      "name": "Meeting Notes Summary",
+      "description": "Summarize meeting notes and extract action items"
+    },
+    "custom": {
+      "name": "Custom Task",
+      "description": "Create your own custom prompt"
+    }
+  }
+}

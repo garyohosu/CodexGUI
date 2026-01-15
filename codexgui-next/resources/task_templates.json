@@ -1,0 +1,52 @@
+{
+  "tasks": [
+    {
+      "id": "organize_folder",
+      "title": "フォルダを整理する",
+      "description": "安全な整理提案→適用",
+      "icon": "folder",
+      "system_prompt": "You are helping organize files in a folder. Analyze the folder structure and propose safe organization improvements. Always show what will change before applying.",
+      "category": "organization"
+    },
+    {
+      "id": "create_file_list",
+      "title": "ファイル一覧を作る",
+      "description": "ツリー/サイズ/更新日",
+      "icon": "list",
+      "system_prompt": "Create a comprehensive file listing with tree structure, sizes, and modification dates. Focus on useful metadata.",
+      "category": "analysis"
+    },
+    {
+      "id": "find_large_files",
+      "title": "大きいファイルを探す",
+      "description": "サイズでソート表示",
+      "icon": "search",
+      "system_prompt": "Identify and list large files in the folder, sorted by size. Help user understand disk usage.",
+      "category": "analysis"
+    },
+    {
+      "id": "find_duplicates",
+      "title": "重複ファイルを探す",
+      "description": "同じ内容のファイル検出",
+      "icon": "duplicate",
+      "system_prompt": "Find duplicate files based on content hash. Suggest safe removal strategies.",
+      "category": "analysis"
+    },
+    {
+      "id": "create_readme",
+      "title": "READMEを作る/更新する",
+      "description": "変更前後をdiff表示",
+      "icon": "document",
+      "system_prompt": "Create or update README file based on project structure. Show diff before applying changes.",
+      "category": "generation"
+    },
+    {
+      "id": "review_changes",
+      "title": "変更点をレビューする",
+      "description": "差分をまとめる",
+      "icon": "review",
+      "system_prompt": "Review and summarize changes in the folder. Identify what was added, modified, or deleted.",
+      "category": "analysis"
+    }
+  ]
+}

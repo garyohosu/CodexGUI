@@ -1,0 +1,125 @@
+{
+  "app": {
+    "name": "CodexGUI",
+    "title": "CodexGUI - Codex CLI ラッパー",
+    "version": "v0.0.1"
+  },
+  "menu": {
+    "file": "ファイル(&F)",
+    "settings": "設定(&S)...",
+    "exit": "終了(&X)",
+    "language": "言語(&L)",
+    "english": "English",
+    "japanese": "日本語",
+    "help": "ヘルプ(&H)",
+    "about": "について(&A)",
+    "codex_installation": "Codex CLI インストール(&I)"
+  },
+  "task_panel": {
+    "task_selection": "タスク選択",
+    "template": "テンプレート:",
+    "target_folder": "対象フォルダ",
+    "select_folder": "フォルダを選択...",
+    "browse": "参照...",
+    "prompt": "プロンプト",
+    "prompt_placeholder": "プロンプトを入力してください...",
+    "execute_task": "タスクを実行"
+  },
+  "output_panel": {
+    "output": "出力",
+    "ready": "準備完了",
+    "clear_output": "出力をクリア",
+    "save_to_file": "ファイルに保存"
+  },
+  "status": {
+    "ready": "準備完了",
+    "executing": "実行中: {task}...",
+    "completed": "実行が正常に完了しました",
+    "failed": "実行に失敗しました",
+    "completed_success": "✓ 正常に完了",
+    "execution_failed": "✗ 実行失敗",
+    "codex_not_available": "警告: Codex CLI が利用できません",
+    "codex_updated": "Codex CLI パスが更新され、確認されました",
+    "language_changed": "言語を変更しました: {language}"
+  },
+  "dialog": {
+    "missing_folder_title": "フォルダが未選択",
+    "missing_folder_text": "対象フォルダを選択してください。",
+    "missing_prompt_title": "プロンプトが未入力",
+    "missing_prompt_text": "プロンプトを入力してください。",
+    "execution_in_progress_title": "実行中",
+    "execution_in_progress_text": "タスクが現在実行中です。本当に終了しますか？",
+    "codex_not_found_title": "Codex CLI が見つかりません",
+    "codex_not_found_text": "Codex CLI がシステムで利用できません。",
+    "codex_not_found_info": "アプリケーションは続行しますが、実行は失敗します。",
+    "codex_not_valid_title": "Codex CLI が見つかりません",
+    "codex_not_valid_text": "指定された Codex CLI パスが無効です。\nパスを確認して、もう一度お試しください。",
+    "settings_updated_title": "設定が更新されました",
+    "settings_updated_text": "Codex CLI の設定が正常に更新されました。",
+    "about_title": "CodexGUI について",
+    "about_text": "<h3>CodexGUI v0.0.1</h3><p>OpenAI Codex CLI 用の Qt/PySide6 GUI ラッパー</p><p>直感的なデスクトップインターフェースを通じて、AI による コード分析、ファイル整理、タスク自動化に簡単にアクセスできます。</p><p><b>作者:</b> garyohosu</p><p><b>GitHub:</b> <a href='https://github.com/garyohosu/CodexGUI'>https://github.com/garyohosu/CodexGUI</a></p>",
+    "codex_help_title": "Codex CLI インストールヘルプ",
+    "codex_help_text": "Codex CLI のインストール方法",
+    "restart_required_title": "再起動が必要",
+    "restart_required_text": "言語の変更はアプリケーションを再起動後に有効になります。\n\n今すぐ再起動しますか？",
+    "restart_later_info": "後でアプリケーションを再起動して言語変更を適用できます。"
+  },
+  "settings": {
+    "title": "設定",
+    "codex_config": "Codex CLI 設定",
+    "codex_path": "Codex CLI パス:",
+    "codex_path_placeholder": "例: codex.exe または /path/to/codex",
+    "browse": "参照...",
+    "help_text": "自動検出する場合は空白のままにしてください。Windows では 'codex.exe' または実行ファイルへのフルパスを使用してください。",
+    "browse_title": "Codex CLI 実行ファイルを選択",
+    "browse_filter": "実行ファイル (*.exe *.cmd);;すべてのファイル (*.*)",
+    "save_error_title": "保存エラー",
+    "save_error_text": "設定の保存に失敗しました: {error}"
+  },
+  "codex": {
+    "install_help_windows": "Codex CLI がインストールされていないか、PATH に含まれていません。\n\nWindows で Codex CLI をインストールするには:\n1. 次のサイトにアクセス: https://developers.openai.com/codex/cli\n2. Windows インストーラーをダウンロード\n3. インストーラーを実行\n4. このアプリケーションを再起動\n\n想定される実行ファイル名: codex.exe, codex.cmd",
+    "install_help_unix": "Codex CLI がインストールされていないか、PATH に含まれていません。\n\nCodex CLI をインストールするには:\n1. 次のサイトにアクセス: https://developers.openai.com/codex/cli\n2. インストール手順に従う\n3. 'codex' が PATH に含まれていることを確認\n4. このアプリケーションを再起動"
+  },
+  "templates": {
+    "file_organization": {
+      "name": "ファイル整理",
+      "description": "フォルダ内のファイルをタイプと日付で整理"
+    },
+    "business_card_extraction": {
+      "name": "名刺データ抽出",
+      "description": "名刺画像から情報を抽出してスプレッドシートを作成"
+    },
+    "code_analysis": {
+      "name": "コード分析",
+      "description": "コード構造を分析してドキュメントを生成"
+    },
+    "receipt_expense": {
+      "name": "レシートから経費レポート",
+      "description": "レシート画像からデータを抽出して経費レポートを作成"
+    },
+    "document_summary": {
+      "name": "ドキュメント要約",
+      "description": "複数のドキュメントを1つのレポートに要約"
+    },
+    "photo_organization": {
+      "name": "写真整理",
+      "description": "写真を日付とイベントで整理"
+    },
+    "code_review": {
+      "name": "コードレビュー",
+      "description": "コードをレビューして提案を提供"
+    },
+    "data_cleanup": {
+      "name": "データクリーンアップ",
+      "description": "データファイルをクリーンアップして標準化"
+    },
+    "meeting_notes": {
+      "name": "議事録要約",
+      "description": "議事録を要約してアクションアイテムを抽出"
+    },
+    "custom": {
+      "name": "カスタムタスク",
+      "description": "独自のカスタムプロンプトを作成"
+    }
+  }
+}
