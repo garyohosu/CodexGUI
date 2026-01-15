@@ -116,7 +116,9 @@ class CodexWrapper:
                 capture_output=True,
                 text=True,
                 timeout=timeout,
-                cwd=cwd
+                cwd=cwd,
+                encoding='utf-8',      # Force UTF-8 encoding
+                errors='replace'       # Replace invalid characters
             )
             
             return CodexResult(
@@ -177,7 +179,9 @@ class CodexWrapper:
                 text=True,
                 cwd=cwd,
                 bufsize=1,
-                universal_newlines=True
+                universal_newlines=True,
+                encoding='utf-8',          # Force UTF-8 encoding
+                errors='replace'           # Replace invalid characters
             )
             
             # Stream output with timeout
