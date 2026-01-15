@@ -17,7 +17,7 @@ def main():
     # Set application metadata
     app.setApplicationName("CodexGUI Next")
     app.setOrganizationName("garyohosu")
-    app.setApplicationVersion("0.1.0-M1")
+    app.setApplicationVersion("0.1.0-M2")
     
     # Create and show main window
     window = MainWindow()

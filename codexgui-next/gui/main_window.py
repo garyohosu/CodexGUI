@@ -16,6 +16,7 @@ from gui.chat_panel import ChatPanel
 from gui.detail_panel import DetailPanel
 from gui.settings_dialog import SettingsDialog
 from core.runner import LocalRunner, RunnerEvent, RunnerState
+from core.orchestrator import Orchestrator, OrchestratorState
 
 
 class MainWindow(QMainWindow):
@@ -24,13 +25,18 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
-        # Initialize runner
-        self.runner = LocalRunner()
+        # Initialize orchestrator (replaces direct runner usage)
+        self.orchestrator = Orchestrator()
+        self.orchestrator.on_state_changed = self._on_orchestrator_state_changed
+        self.orchestrator.on_message = self._on_orchestrator_message
+        self.orchestrator.on_plan_ready = self._on_plan_ready
+        self.orchestrator.on_runner_event = self._on_runner_event
         
         # State
         self.current_folder = None
         self.selected_files = []
         self.current_task = None
+        self.current_plan = None
         
         self._init_ui()
     
@@ -149,34 +155,8 @@ class MainWindow(QMainWindow):
             )
             return
         
-        # Show task confirmation
-        task_title = task_data.get('title', 'Unknown Task')
-        self.chat.append_message(
-            f"タスク「{task_title}」を実行します。対象: {self.current_folder}",
-            "assistant"
-        )
-        
-        # For M1, just execute a simple listing command
-        self._execute_task(task_data)
-    
-    def _on_message_sent(self, message: str):
-        """Handle user message."""
-        # For M1, just echo back
-        self.chat.append_message(
-            f"メッセージを受信しました: {message}",
-            "assistant"
-        )
-        
-        # TODO: In M2, send to OpenAI API for planning
-    
-    def _execute_task(self, task_data: dict):
-        """
-        Execute task using Runner.
-        
-        Args:
-            task_data: Task definition
-        """
-        if self.runner.is_running():
+        # Check if busy
+        if self.orchestrator.is_busy():
             QMessageBox.warning(
                 self,
                 "実行中",
@@ -184,43 +164,126 @@ class MainWindow(QMainWindow):
             )
             return
         
+        # Start task with orchestrator
+        task_id = task_data.get('id', '')
+        task_title = task_data.get('title', 'Unknown Task')
+        user_request = task_data.get('description', '')
+        
+        self.chat.append_message(
+            f"タスク「{task_title}」を開始します...",
+            "system"
+        )
+        
         # Show details panel
         self.bottom_tabs.setVisible(True)
         self.toggle_details_action.setChecked(True)
-        
-        # Clear previous logs
         self.detail.clear_logs()
         
-        # Build simple prompt for M1 testing
-        task_id = task_data.get('id', '')
+        # Start task
+        self.orchestrator.start_task(
+            task_id=task_id,
+            task_title=task_title,
+            user_request=user_request,
+            folder_path=self.current_folder,
+            selected_files=self.selected_files
+        )
+    
+    def _on_message_sent(self, message: str):
+        """Handle user message."""
+        # Check orchestrator state
+        state = self.orchestrator.get_state()
         
-        # Simple prompts for testing
-        prompt_map = {
-            'organize_folder': 'List all files in this folder with their sizes',
-            'create_file_list': 'Create a file listing with tree structure',
-            'find_large_files': 'Find files larger than 10MB',
-            'find_duplicates': 'Find duplicate files',
-            'create_readme': 'Analyze project and suggest README content',
-            'review_changes': 'List recently modified files'
+        if state == OrchestratorState.CLARIFYING:
+            # Provide clarification answer
+            self.orchestrator.provide_clarification(message)
+        elif state == OrchestratorState.REVIEWING:
+            # User might want to modify plan or confirm
+            # For now, treat as general chat
+            self.chat.append_message(
+                "プランを確認してください。実行する場合は「実行」ボタンをクリックしてください。",
+                "assistant"
+            )
+        else:
+            # General conversation (future: use OpenAI chat)
+            self.chat.append_message(
+                f"メッセージを受信しました: {message}\n\n"
+                "タスクを開始するには、上のタスクカードをクリックしてください。",
+                "assistant"
+            )
+    
+    # Orchestrator callbacks
+    
+    def _on_orchestrator_state_changed(self, state: OrchestratorState):
+        """Handle orchestrator state change."""
+        state_messages = {
+            OrchestratorState.IDLE: "待機中",
+            OrchestratorState.PLANNING: "計画を生成中...",
+            OrchestratorState.CLARIFYING: "追加情報が必要です",
+            OrchestratorState.REVIEWING: "計画を確認してください",
+            OrchestratorState.RUNNING: "実行中...",
+            OrchestratorState.SUMMARIZING: "結果を要約中...",
+            OrchestratorState.COMPLETED: "完了",
+            OrchestratorState.ERROR: "エラー"
         }
         
-        prompt = prompt_map.get(task_id, 'List all files')
+        message = state_messages.get(state, str(state))
+        self.status_bar.showMessage(message)
         
-        # Update UI
-        self.chat.append_message("実行を開始します...", "system")
-        self.chat.set_input_enabled(False)
-        self.status_bar.showMessage("実行中...")
+        # Enable/disable input based on state
+        if state in [OrchestratorState.RUNNING, OrchestratorState.PLANNING, OrchestratorState.SUMMARIZING]:
+            self.chat.set_input_enabled(False)
+        else:
+            self.chat.set_input_enabled(True)
+    
+    def _on_orchestrator_message(self, message: str, sender: str):
+        """Handle message from orchestrator."""
+        self.chat.append_message(message, sender)
+    
+    def _on_plan_ready(self, plan: dict):
+        """Handle plan ready from orchestrator."""
+        self.current_plan = plan
         
-        # Execute with Runner
-        self.runner.execute(
-            prompt=prompt,
-            working_dir=self.current_folder,
-            callback=self._on_runner_event
-        )
+        # Display plan to user
+        plan_type = plan.get('type', 'unknown')
+        
+        if plan_type == 'plan':
+            steps = plan.get('steps', [])
+            warnings = plan.get('warnings', [])
+            
+            # Format plan message
+            plan_text = "📋 **実行計画**\n\n"
+            
+            for i, step in enumerate(steps, 1):
+                desc = step.get('description', 'ステップ')
+                plan_text += f"{i}. {desc}\n"
+            
+            if warnings:
+                plan_text += "\n⚠️ **警告**\n"
+                for warning in warnings:
+                    plan_text += f"• {warning}\n"
+            
+            plan_text += "\n実行してよろしいですか？"
+            
+            self.chat.append_message(plan_text, "assistant")
+            
+            # Show confirmation dialog
+            reply = QMessageBox.question(
+                self,
+                "実行確認",
+                "この計画を実行しますか？\n\n" + plan_text,
+                QMessageBox.Yes | QMessageBox.No,
+                QMessageBox.No
+            )
+            
+            if reply == QMessageBox.Yes:
+                self.orchestrator.execute_plan()
+            else:
+                self.chat.append_message("実行をキャンセルしました", "system")
+                self.orchestrator.cancel()
     
     @Slot(object)
     def _on_runner_event(self, event: RunnerEvent):
-        """Handle runner event."""
+        """Handle runner event from orchestrator."""
         # Log to detail panel
         if event.type == "command":
             self.detail.append_command(event.data)
@@ -235,29 +298,6 @@ class MainWindow(QMainWindow):
         
         # Log to events
         self.detail.append_event(event.type, event.data, event.timestamp)
-        
-        # Check if execution finished
-        if event.type in ["status", "error"]:
-            state = self.runner.get_state()
-            
-            if state in [RunnerState.COMPLETED, RunnerState.FAILED, RunnerState.CANCELLED]:
-                self._on_execution_finished(state)
-    
-    def _on_execution_finished(self, state: RunnerState):
-        """Handle execution completion."""
-        # Re-enable UI
-        self.chat.set_input_enabled(True)
-        
-        # Update status
-        if state == RunnerState.COMPLETED:
-            self.status_bar.showMessage("実行完了")
-            self.chat.append_message("✓ 実行が完了しました", "assistant")
-        elif state == RunnerState.FAILED:
-            self.status_bar.showMessage("実行失敗")
-            self.chat.append_message("✗ 実行に失敗しました", "assistant")
-        elif state == RunnerState.CANCELLED:
-            self.status_bar.showMessage("実行中止")
-            self.chat.append_message("実行を中止しました", "system")
     
     def _on_toggle_details(self, checked: bool):
         """Toggle details panel visibility."""
@@ -273,15 +313,15 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "About CodexGUI Next",
-            "<h3>CodexGUI Next v0.1.0-M1</h3>"
+            "<h3>CodexGUI Next v0.1.0-M2</h3>"
             "<p>Chat-driven GUI for ChatGPT API × Codex CLI integration</p>"
-            "<p><b>Milestone 1:</b> Basic UI structure with streaming execution</p>"
+            "<p><b>Milestone 2:</b> OpenAI API integration with plan generation and summarization</p>"
             "<p><b>Author:</b> garyohosu</p>"
         )
     
     def closeEvent(self, event):
         """Handle window close event."""
-        if self.runner.is_running():
+        if self.orchestrator.is_busy():
             reply = QMessageBox.question(
                 self,
                 "実行中",
@@ -291,7 +331,7 @@ class MainWindow(QMainWindow):
             )
             
             if reply == QMessageBox.Yes:
-                self.runner.cancel()
+                self.orchestrator.cancel()
                 event.accept()
             else:
                 event.ignore()
