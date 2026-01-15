@@ -145,7 +145,8 @@ class CodexWrapper:
         self,
         prompt: str,
         working_dir: Optional[str] = None,
-        callback=None
+        callback=None,
+        timeout: Optional[int] = 300
     ):
         """
         Execute a prompt with streaming output.
@@ -154,6 +155,7 @@ class CodexWrapper:
             prompt: The prompt to execute
             working_dir: Working directory for execution
             callback: Callback function for streaming output (receives output line)
+            timeout: Timeout in seconds (default: 300)
         """
         try:
             # Build command - Use 'exec' with --yolo for full automation
@@ -171,41 +173,56 @@ class CodexWrapper:
             process = subprocess.Popen(
                 cmd,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
+                stderr=subprocess.STDOUT,  # Merge stderr to stdout
                 text=True,
                 cwd=cwd,
-                bufsize=1
+                bufsize=1,
+                universal_newlines=True
             )
             
-            # Stream stdout and stderr
-            if callback:
-                # Read from both stdout and stderr
-                import select
-                import sys
-                
-                while True:
-                    # Read available lines
-                    line = process.stdout.readline()
-                    if line:
-                        callback(line.rstrip())
-                    
-                    # Check if process finished
-                    if process.poll() is not None:
-                        # Read remaining output
-                        for line in process.stdout:
-                            callback(line.rstrip())
-                        break
+            # Stream output with timeout
+            import threading
+            import time
             
-            # Wait for completion
-            process.wait()
+            output_lines = []
+            error_occurred = False
             
-            # Get any remaining stderr
-            stderr = process.stderr.read()
+            def read_output():
+                nonlocal error_occurred
+                try:
+                    for line in iter(process.stdout.readline, ''):
+                        if line:
+                            output_lines.append(line.rstrip())
+                            if callback:
+                                callback(line.rstrip())
+                except Exception as e:
+                    error_occurred = True
+                    if callback:
+                        callback(f"Error reading output: {e}")
+            
+            # Start reading thread
+            reader_thread = threading.Thread(target=read_output, daemon=True)
+            reader_thread.start()
+            
+            # Wait for process with timeout
+            try:
+                process.wait(timeout=timeout)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                return CodexResult(
+                    success=False,
+                    output='\n'.join(output_lines),
+                    error=f"Execution timed out after {timeout} seconds",
+                    exit_code=-1
+                )
+            
+            # Wait for reader thread to finish (with timeout)
+            reader_thread.join(timeout=5)
             
             return CodexResult(
                 success=process.returncode == 0,
-                output="",  # Already streamed via callback
-                error=stderr,
+                output='\n'.join(output_lines),
+                error="" if not error_occurred else "Error occurred during output reading",
                 exit_code=process.returncode
             )
             
