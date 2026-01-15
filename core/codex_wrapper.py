@@ -96,8 +96,8 @@ class CodexWrapper:
             CodexResult containing execution results
         """
         try:
-            # Build command
-            cmd = [self.codex_path, "prompt", prompt]
+            # Build command - Codex CLI accepts prompt directly as argument
+            cmd = [self.codex_path, prompt]
             
             # Set working directory
             cwd = working_dir or os.getcwd()
@@ -148,7 +148,8 @@ class CodexWrapper:
             callback: Callback function for streaming output (receives output line)
         """
         try:
-            cmd = [self.codex_path, "prompt", prompt]
+            # Build command - Codex CLI accepts prompt directly as argument
+            cmd = [self.codex_path, prompt]
             cwd = working_dir or os.getcwd()
             
             process = subprocess.Popen(
