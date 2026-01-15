@@ -8,6 +8,9 @@ and retrieve results.
 import subprocess
 import json
 import os
+import sys
+import shutil
+from pathlib import Path
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
 
@@ -24,15 +27,38 @@ class CodexResult:
 class CodexWrapper:
     """Wrapper for OpenAI Codex CLI."""
     
-    def __init__(self, codex_path: str = "codex"):
+    def __init__(self, codex_path: Optional[str] = None):
         """
         Initialize Codex wrapper.
         
         Args:
-            codex_path: Path to codex CLI executable (default: "codex")
+            codex_path: Path to codex CLI executable (default: auto-detect)
         """
-        self.codex_path = codex_path
-        self._check_codex_available()
+        self.codex_path = codex_path or self._find_codex_executable()
+        self._available = self._check_codex_available()
+    
+    def _find_codex_executable(self) -> str:
+        """
+        Find Codex CLI executable in system.
+        
+        Returns:
+            Path to codex executable
+        """
+        # Try common names
+        if sys.platform == "win32":
+            # Windows: try .exe and .cmd
+            candidates = ["codex.exe", "codex.cmd", "codex"]
+        else:
+            # Unix-like: just codex
+            candidates = ["codex"]
+        
+        # Check if in PATH
+        for candidate in candidates:
+            if shutil.which(candidate):
+                return candidate
+        
+        # Return default
+        return "codex.exe" if sys.platform == "win32" else "codex"
     
     def _check_codex_available(self) -> bool:
         """
@@ -187,7 +213,34 @@ class CodexWrapper:
         Returns:
             True if available, False otherwise
         """
-        return self._check_codex_available()
+        return self._available
+    
+    def get_installation_help(self) -> str:
+        """
+        Get help message for installing Codex CLI.
+        
+        Returns:
+            Installation help message
+        """
+        if sys.platform == "win32":
+            return (
+                "Codex CLI is not installed or not in PATH.\n\n"
+                "To install Codex CLI on Windows:\n"
+                "1. Visit: https://developers.openai.com/codex/cli\n"
+                "2. Download the Windows installer\n"
+                "3. Run the installer\n"
+                "4. Restart this application\n\n"
+                "Expected executable names: codex.exe, codex.cmd"
+            )
+        else:
+            return (
+                "Codex CLI is not installed or not in PATH.\n\n"
+                "To install Codex CLI:\n"
+                "1. Visit: https://developers.openai.com/codex/cli\n"
+                "2. Follow installation instructions\n"
+                "3. Ensure 'codex' is in your PATH\n"
+                "4. Restart this application"
+            )
 
 
 # Module-level convenience function

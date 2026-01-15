@@ -6,12 +6,14 @@ This module provides the main application window.
 
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QSplitter, QMessageBox, QStatusBar
+    QSplitter, QMessageBox, QStatusBar, QMenuBar, QMenu
 )
 from PySide6.QtCore import Qt, QThread, Signal, Slot
+from PySide6.QtGui import QAction
 
 from gui.task_panel import TaskPanel
 from gui.output_panel import OutputPanel
+from gui.settings_dialog import SettingsDialog
 from core.codex_wrapper import CodexWrapper, CodexResult
 
 
@@ -60,7 +62,11 @@ class MainWindow(QMainWindow):
     
     def __init__(self):
         super().__init__()
-        self.codex_wrapper = CodexWrapper()
+        
+        # Load custom codex path from settings
+        custom_path = SettingsDialog.load_codex_path()
+        self.codex_wrapper = CodexWrapper(custom_path if custom_path else None)
+        
         self.worker = None
         self._init_ui()
         self._check_codex_availability()
@@ -69,6 +75,9 @@ class MainWindow(QMainWindow):
         """Initialize UI components."""
         self.setWindowTitle("CodexGUI - Codex CLI Wrapper")
         self.setMinimumSize(1000, 700)
+        
+        # Create menu bar
+        self._create_menu_bar()
         
         # Central widget
         central_widget = QWidget()
@@ -99,19 +108,50 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Ready")
     
+    def _create_menu_bar(self):
+        """Create menu bar."""
+        menubar = self.menuBar()
+        
+        # File menu
+        file_menu = menubar.addMenu("&File")
+        
+        settings_action = QAction("&Settings...", self)
+        settings_action.triggered.connect(self._on_settings_clicked)
+        file_menu.addAction(settings_action)
+        
+        file_menu.addSeparator()
+        
+        exit_action = QAction("E&xit", self)
+        exit_action.triggered.connect(self.close)
+        file_menu.addAction(exit_action)
+        
+        # Help menu
+        help_menu = menubar.addMenu("&Help")
+        
+        about_action = QAction("&About", self)
+        about_action.triggered.connect(self._on_about_clicked)
+        help_menu.addAction(about_action)
+        
+        codex_help_action = QAction("Codex CLI &Installation", self)
+        codex_help_action.triggered.connect(self._on_codex_help_clicked)
+        help_menu.addAction(codex_help_action)
+    
     def _check_codex_availability(self):
         """Check if Codex CLI is available."""
         if not self.codex_wrapper.is_available():
-            QMessageBox.warning(
-                self,
-                "Codex CLI Not Found",
-                "Codex CLI is not available in your system.\n\n"
-                "Please ensure:\n"
-                "1. Codex CLI is installed\n"
-                "2. It's in your system PATH\n"
-                "3. You have necessary permissions\n\n"
+            help_text = self.codex_wrapper.get_installation_help()
+            
+            msg_box = QMessageBox(self)
+            msg_box.setIcon(QMessageBox.Warning)
+            msg_box.setWindowTitle("Codex CLI Not Found")
+            msg_box.setText("Codex CLI is not available in your system.")
+            msg_box.setInformativeText(
                 "The application will continue, but execution will fail."
             )
+            msg_box.setDetailedText(help_text)
+            msg_box.setStandardButtons(QMessageBox.Ok)
+            msg_box.exec()
+            
             self.status_bar.showMessage("Warning: Codex CLI not available")
     
     def _on_execute_clicked(self):
@@ -188,6 +228,58 @@ class MainWindow(QMainWindow):
         
         # Clean up worker
         self.worker = None
+    
+    def _on_settings_clicked(self):
+        """Handle settings menu click."""
+        dialog = SettingsDialog(self)
+        if dialog.exec():
+            # Reload Codex wrapper with new settings
+            custom_path = dialog.get_codex_path()
+            self.codex_wrapper = CodexWrapper(custom_path if custom_path else None)
+            
+            # Update status
+            if self.codex_wrapper.is_available():
+                self.status_bar.showMessage("Codex CLI path updated and verified")
+                QMessageBox.information(
+                    self,
+                    "Settings Updated",
+                    "Codex CLI configuration has been updated successfully."
+                )
+            else:
+                self.status_bar.showMessage("Warning: Codex CLI not available")
+                QMessageBox.warning(
+                    self,
+                    "Codex CLI Not Found",
+                    "The specified Codex CLI path is not valid.\n"
+                    "Please check the path and try again."
+                )
+    
+    def _on_about_clicked(self):
+        """Handle about menu click."""
+        QMessageBox.about(
+            self,
+            "About CodexGUI",
+            "<h3>CodexGUI v1.0.0</h3>"
+            "<p>A Qt/PySide6 GUI wrapper for OpenAI Codex CLI</p>"
+            "<p>Enables easy access to AI-powered code analysis, "
+            "file organization, and task automation through an "
+            "intuitive desktop interface.</p>"
+            "<p><b>Author:</b> garyohosu</p>"
+            "<p><b>GitHub:</b> <a href='https://github.com/garyohosu/CodexGUI'>"
+            "https://github.com/garyohosu/CodexGUI</a></p>"
+        )
+    
+    def _on_codex_help_clicked(self):
+        """Handle Codex CLI help menu click."""
+        help_text = self.codex_wrapper.get_installation_help()
+        
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Codex CLI Installation Help")
+        msg_box.setText("How to install Codex CLI")
+        msg_box.setInformativeText(help_text)
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        msg_box.exec()
     
     def closeEvent(self, event):
         """Handle window close event."""
