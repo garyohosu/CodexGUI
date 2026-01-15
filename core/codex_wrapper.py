@@ -13,6 +13,7 @@ import shutil
 from pathlib import Path
 from typing import Optional, Dict, Any, List
 from dataclasses import dataclass
+from core.i18n import tr
 
 
 @dataclass
@@ -275,24 +276,9 @@ class CodexWrapper:
             Installation help message
         """
         if sys.platform == "win32":
-            return (
-                "Codex CLI is not installed or not in PATH.\n\n"
-                "To install Codex CLI on Windows:\n"
-                "1. Visit: https://developers.openai.com/codex/cli\n"
-                "2. Download the Windows installer\n"
-                "3. Run the installer\n"
-                "4. Restart this application\n\n"
-                "Expected executable names: codex.exe, codex.cmd"
-            )
+            return tr("codex.install_help_windows")
         else:
-            return (
-                "Codex CLI is not installed or not in PATH.\n\n"
-                "To install Codex CLI:\n"
-                "1. Visit: https://developers.openai.com/codex/cli\n"
-                "2. Follow installation instructions\n"
-                "3. Ensure 'codex' is in your PATH\n"
-                "4. Restart this application"
-            )
+            return tr("codex.install_help_unix")
 
 
 # Module-level convenience function

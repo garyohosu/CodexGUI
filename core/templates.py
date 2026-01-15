@@ -8,6 +8,7 @@ import json
 import os
 from typing import List, Dict, Optional
 from dataclasses import dataclass
+from core.i18n import get_language_manager, tr
 
 
 @dataclass
@@ -50,10 +51,21 @@ class TemplateManager:
                 with open(self.templates_file, 'r', encoding='utf-8') as f:
                     data = json.load(f)
                     for template_data in data.get('templates', []):
+                        # Get translated name and description
+                        template_id = template_data['id']
+                        name = tr(f"templates.{template_id}.name")
+                        description = tr(f"templates.{template_id}.description")
+                        
+                        # If translation not found, use original
+                        if name == f"templates.{template_id}.name":
+                            name = template_data['name']
+                        if description == f"templates.{template_id}.description":
+                            description = template_data['description']
+                        
                         template = TaskTemplate(
-                            id=template_data['id'],
-                            name=template_data['name'],
-                            description=template_data['description'],
+                            id=template_id,
+                            name=name,
+                            description=description,
                             prompt=template_data['prompt'],
                             category=template_data['category']
                         )

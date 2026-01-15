@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
 )
 from PySide6.QtCore import Qt, Signal, Slot
 from PySide6.QtGui import QTextCursor, QFont
+from core.i18n import tr
 
 
 class OutputPanel(QWidget):
@@ -27,11 +28,11 @@ class OutputPanel(QWidget):
         layout = QVBoxLayout(self)
         
         # Output group
-        output_group = QGroupBox("Output")
+        output_group = QGroupBox(tr("output_panel.output"))
         output_layout = QVBoxLayout(output_group)
         
         # Status label
-        self.status_label = QLabel("Ready")
+        self.status_label = QLabel(tr("output_panel.ready"))
         self.status_label.setStyleSheet("""
             QLabel {
                 padding: 5px;
@@ -59,11 +60,11 @@ class OutputPanel(QWidget):
         # Button layout
         button_layout = QHBoxLayout()
         
-        self.clear_button = QPushButton("Clear Output")
+        self.clear_button = QPushButton(tr("output_panel.clear_output"))
         self.clear_button.clicked.connect(self._on_clear_clicked)
         button_layout.addWidget(self.clear_button)
         
-        self.save_button = QPushButton("Save to File")
+        self.save_button = QPushButton(tr("output_panel.save_to_file"))
         self.save_button.setEnabled(False)
         button_layout.addWidget(self.save_button)
         
@@ -75,7 +76,7 @@ class OutputPanel(QWidget):
     def _on_clear_clicked(self):
         """Handle clear button click."""
         self.output_text.clear()
-        self.status_label.setText("Ready")
+        self.status_label.setText(tr("output_panel.ready"))
         self.clear_requested.emit()
     
     @Slot(str)
@@ -130,7 +131,7 @@ class OutputPanel(QWidget):
     def clear(self):
         """Clear output display."""
         self.output_text.clear()
-        self.status_label.setText("Ready")
+        self.status_label.setText(tr("output_panel.ready"))
         self.save_button.setEnabled(False)
     
     def get_output_text(self) -> str:

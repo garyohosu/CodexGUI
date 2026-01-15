@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QDialogButtonBox, QMessageBox
 )
 from PySide6.QtCore import Qt
+from core.i18n import tr
 import json
 import os
 
@@ -19,7 +20,7 @@ class SettingsDialog(QDialog):
     
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setWindowTitle("Settings")
+        self.setWindowTitle(tr("settings.title"))
         self.setMinimumWidth(500)
         self._init_ui()
         self._load_settings()
@@ -29,28 +30,25 @@ class SettingsDialog(QDialog):
         layout = QVBoxLayout(self)
         
         # Codex CLI settings group
-        codex_group = QGroupBox("Codex CLI Configuration")
+        codex_group = QGroupBox(tr("settings.codex_config"))
         codex_layout = QVBoxLayout(codex_group)
         
         # Path input
         path_layout = QHBoxLayout()
-        path_layout.addWidget(QLabel("Codex CLI Path:"))
+        path_layout.addWidget(QLabel(tr("settings.codex_path")))
         
         self.codex_path_input = QLineEdit()
-        self.codex_path_input.setPlaceholderText("e.g., codex.exe or /path/to/codex")
+        self.codex_path_input.setPlaceholderText(tr("settings.codex_path_placeholder"))
         path_layout.addWidget(self.codex_path_input, 1)
         
-        self.browse_button = QPushButton("Browse...")
+        self.browse_button = QPushButton(tr("settings.browse"))
         self.browse_button.clicked.connect(self._on_browse_clicked)
         path_layout.addWidget(self.browse_button)
         
         codex_layout.addLayout(path_layout)
         
         # Help text
-        help_label = QLabel(
-            "Leave empty for auto-detection. "
-            "On Windows, use 'codex.exe' or full path to the executable."
-        )
+        help_label = QLabel(tr("settings.help_text"))
         help_label.setWordWrap(True)
         help_label.setStyleSheet("color: gray; font-size: 10px;")
         codex_layout.addWidget(help_label)
@@ -69,9 +67,9 @@ class SettingsDialog(QDialog):
         """Handle browse button click."""
         file_path, _ = QFileDialog.getOpenFileName(
             self,
-            "Select Codex CLI Executable",
+            tr("settings.browse_title"),
             "",
-            "Executable Files (*.exe *.cmd);;All Files (*.*)"
+            tr("settings.browse_filter")
         )
         
         if file_path:
@@ -104,8 +102,8 @@ class SettingsDialog(QDialog):
         except Exception as e:
             QMessageBox.warning(
                 self,
-                "Save Error",
-                f"Failed to save settings: {e}"
+                tr("settings.save_error_title"),
+                tr("settings.save_error_text", error=str(e))
             )
     
     def _get_settings_file(self) -> str:

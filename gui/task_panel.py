@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 from PySide6.QtCore import Signal
 
 from core.templates import TemplateManager, TaskTemplate
+from core.i18n import tr
 
 
 class TaskPanel(QWidget):
@@ -31,12 +32,12 @@ class TaskPanel(QWidget):
         layout = QVBoxLayout(self)
         
         # Task selection group
-        task_group = QGroupBox("Task Selection")
+        task_group = QGroupBox(tr("task_panel.task_selection"))
         task_layout = QVBoxLayout(task_group)
         
         # Template selector
         selector_layout = QHBoxLayout()
-        selector_layout.addWidget(QLabel("Template:"))
+        selector_layout.addWidget(QLabel(tr("task_panel.template")))
         self.template_combo = QComboBox()
         self.template_combo.currentIndexChanged.connect(self._on_template_changed)
         selector_layout.addWidget(self.template_combo, 1)
@@ -51,15 +52,15 @@ class TaskPanel(QWidget):
         layout.addWidget(task_group)
         
         # Folder selection group
-        folder_group = QGroupBox("Target Folder")
+        folder_group = QGroupBox(tr("task_panel.target_folder"))
         folder_layout = QVBoxLayout(folder_group)
         
         folder_select_layout = QHBoxLayout()
         self.folder_path = QLineEdit()
-        self.folder_path.setPlaceholderText("Select a folder...")
+        self.folder_path.setPlaceholderText(tr("task_panel.select_folder"))
         folder_select_layout.addWidget(self.folder_path, 1)
         
-        self.browse_button = QPushButton("Browse...")
+        self.browse_button = QPushButton(tr("task_panel.browse"))
         self.browse_button.clicked.connect(self._on_browse_clicked)
         folder_select_layout.addWidget(self.browse_button)
         
@@ -67,18 +68,18 @@ class TaskPanel(QWidget):
         layout.addWidget(folder_group)
         
         # Prompt group
-        prompt_group = QGroupBox("Prompt")
+        prompt_group = QGroupBox(tr("task_panel.prompt"))
         prompt_layout = QVBoxLayout(prompt_group)
         
         self.prompt_edit = QTextEdit()
-        self.prompt_edit.setPlaceholderText("Enter your prompt here...")
+        self.prompt_edit.setPlaceholderText(tr("task_panel.prompt_placeholder"))
         self.prompt_edit.setMaximumHeight(150)
         prompt_layout.addWidget(self.prompt_edit)
         
         layout.addWidget(prompt_group)
         
         # Execute button
-        self.execute_button = QPushButton("Execute Task")
+        self.execute_button = QPushButton(tr("task_panel.execute_task"))
         self.execute_button.setStyleSheet("""
             QPushButton {
                 background-color: #4CAF50;
@@ -131,7 +132,7 @@ class TaskPanel(QWidget):
         """Handle browse button click."""
         folder = QFileDialog.getExistingDirectory(
             self,
-            "Select Target Folder",
+            tr("task_panel.target_folder"),
             self.folder_path.text() or ""
         )
         

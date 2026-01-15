@@ -6,15 +6,16 @@ This module provides the main application window.
 
 from PySide6.QtWidgets import (
     QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QSplitter, QMessageBox, QStatusBar, QMenuBar, QMenu
+    QSplitter, QMessageBox, QStatusBar, QMenuBar, QMenu, QActionGroup
 )
-from PySide6.QtCore import Qt, QThread, Signal, Slot
+from PySide6.QtCore import Qt, QThread, Signal, Slot, QCoreApplication
 from PySide6.QtGui import QAction
 
 from gui.task_panel import TaskPanel
 from gui.output_panel import OutputPanel
 from gui.settings_dialog import SettingsDialog
 from core.codex_wrapper import CodexWrapper, CodexResult
+from core.i18n import get_language_manager, tr
 
 
 class CodexWorker(QThread):
@@ -63,6 +64,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         
+        # Initialize language manager
+        self.lang_manager = get_language_manager()
+        
         # Load custom codex path from settings
         custom_path = SettingsDialog.load_codex_path()
         self.codex_wrapper = CodexWrapper(custom_path if custom_path else None)
@@ -73,7 +77,7 @@ class MainWindow(QMainWindow):
     
     def _init_ui(self):
         """Initialize UI components."""
-        self.setWindowTitle("CodexGUI - Codex CLI Wrapper")
+        self.setWindowTitle(tr("app.title"))
         self.setMinimumSize(1000, 700)
         
         # Create menu bar
@@ -106,33 +110,53 @@ class MainWindow(QMainWindow):
         # Status bar
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
-        self.status_bar.showMessage("Ready")
+        self.status_bar.showMessage(tr("status.ready"))
     
     def _create_menu_bar(self):
         """Create menu bar."""
         menubar = self.menuBar()
         
         # File menu
-        file_menu = menubar.addMenu("&File")
+        file_menu = menubar.addMenu(tr("menu.file"))
         
-        settings_action = QAction("&Settings...", self)
+        settings_action = QAction(tr("menu.settings"), self)
         settings_action.triggered.connect(self._on_settings_clicked)
         file_menu.addAction(settings_action)
         
         file_menu.addSeparator()
         
-        exit_action = QAction("E&xit", self)
+        exit_action = QAction(tr("menu.exit"), self)
         exit_action.triggered.connect(self.close)
         file_menu.addAction(exit_action)
         
-        # Help menu
-        help_menu = menubar.addMenu("&Help")
+        # Language menu
+        language_menu = menubar.addMenu(tr("menu.language"))
         
-        about_action = QAction("&About", self)
+        # Create action group for language selection
+        language_group = QActionGroup(self)
+        language_group.setExclusive(True)
+        
+        # Add language options
+        languages = self.lang_manager.get_all_languages()
+        current_lang = self.lang_manager.get_current_language()
+        
+        for lang_code, lang_name in languages.items():
+            lang_action = QAction(lang_name, self)
+            lang_action.setCheckable(True)
+            lang_action.setChecked(lang_code == current_lang)
+            lang_action.setData(lang_code)
+            lang_action.triggered.connect(lambda checked, code=lang_code: self._on_language_changed(code))
+            language_group.addAction(lang_action)
+            language_menu.addAction(lang_action)
+        
+        # Help menu
+        help_menu = menubar.addMenu(tr("menu.help"))
+        
+        about_action = QAction(tr("menu.about"), self)
         about_action.triggered.connect(self._on_about_clicked)
         help_menu.addAction(about_action)
         
-        codex_help_action = QAction("Codex CLI &Installation", self)
+        codex_help_action = QAction(tr("menu.codex_installation"), self)
         codex_help_action.triggered.connect(self._on_codex_help_clicked)
         help_menu.addAction(codex_help_action)
     
@@ -143,16 +167,14 @@ class MainWindow(QMainWindow):
             
             msg_box = QMessageBox(self)
             msg_box.setIcon(QMessageBox.Warning)
-            msg_box.setWindowTitle("Codex CLI Not Found")
-            msg_box.setText("Codex CLI is not available in your system.")
-            msg_box.setInformativeText(
-                "The application will continue, but execution will fail."
-            )
+            msg_box.setWindowTitle(tr("dialog.codex_not_found_title"))
+            msg_box.setText(tr("dialog.codex_not_found_text"))
+            msg_box.setInformativeText(tr("dialog.codex_not_found_info"))
             msg_box.setDetailedText(help_text)
             msg_box.setStandardButtons(QMessageBox.Ok)
             msg_box.exec()
             
-            self.status_bar.showMessage("Warning: Codex CLI not available")
+            self.status_bar.showMessage(tr("status.codex_not_available"))
     
     def _on_execute_clicked(self):
         """Handle execute button click."""
@@ -161,8 +183,8 @@ class MainWindow(QMainWindow):
         if not folder_path:
             QMessageBox.warning(
                 self,
-                "Missing Folder",
-                "Please select a target folder."
+                tr("dialog.missing_folder_title"),
+                tr("dialog.missing_folder_text")
             )
             return
         
@@ -170,8 +192,8 @@ class MainWindow(QMainWindow):
         if not prompt.strip():
             QMessageBox.warning(
                 self,
-                "Missing Prompt",
-                "Please enter a prompt."
+                tr("dialog.missing_prompt_title"),
+                tr("dialog.missing_prompt_text")
             )
             return
         
@@ -181,8 +203,8 @@ class MainWindow(QMainWindow):
         
         # Update status
         template = self.task_panel.get_current_template()
-        self.status_bar.showMessage(f"Executing: {template.name}...")
-        self.output_panel.set_status(f"Executing: {template.name}")
+        self.status_bar.showMessage(tr("status.executing", task=template.name))
+        self.output_panel.set_status(tr("status.executing", task=template.name))
         
         # Log execution start
         self.output_panel.append_output("=" * 60)
@@ -210,18 +232,18 @@ class MainWindow(QMainWindow):
         
         # Update status
         if result.success:
-            self.status_bar.showMessage("Execution completed successfully")
-            self.output_panel.set_status("✓ Completed successfully")
+            self.status_bar.showMessage(tr("status.completed"))
+            self.output_panel.set_status(tr("status.completed_success"))
             self.output_panel.append_output("")
             self.output_panel.append_output("=" * 60)
-            self.output_panel.append_output("Execution completed successfully")
+            self.output_panel.append_output(tr("status.completed"))
             self.output_panel.append_output("=" * 60)
         else:
-            self.status_bar.showMessage("Execution failed")
-            self.output_panel.set_status("✗ Execution failed")
+            self.status_bar.showMessage(tr("status.failed"))
+            self.output_panel.set_status(tr("status.execution_failed"))
             self.output_panel.append_output("")
             self.output_panel.append_output("=" * 60)
-            self.output_panel.append_output("Execution failed")
+            self.output_panel.append_output(tr("status.failed"))
             if result.error:
                 self.output_panel.append_error(result.error)
             self.output_panel.append_output("=" * 60)
@@ -239,34 +261,26 @@ class MainWindow(QMainWindow):
             
             # Update status
             if self.codex_wrapper.is_available():
-                self.status_bar.showMessage("Codex CLI path updated and verified")
+                self.status_bar.showMessage(tr("status.codex_updated"))
                 QMessageBox.information(
                     self,
-                    "Settings Updated",
-                    "Codex CLI configuration has been updated successfully."
+                    tr("dialog.settings_updated_title"),
+                    tr("dialog.settings_updated_text")
                 )
             else:
-                self.status_bar.showMessage("Warning: Codex CLI not available")
+                self.status_bar.showMessage(tr("status.codex_not_available"))
                 QMessageBox.warning(
                     self,
-                    "Codex CLI Not Found",
-                    "The specified Codex CLI path is not valid.\n"
-                    "Please check the path and try again."
+                    tr("dialog.codex_not_valid_title"),
+                    tr("dialog.codex_not_valid_text")
                 )
     
     def _on_about_clicked(self):
         """Handle about menu click."""
         QMessageBox.about(
             self,
-            "About CodexGUI",
-            "<h3>CodexGUI v0.0.1</h3>"
-            "<p>A Qt/PySide6 GUI wrapper for OpenAI Codex CLI</p>"
-            "<p>Enables easy access to AI-powered code analysis, "
-            "file organization, and task automation through an "
-            "intuitive desktop interface.</p>"
-            "<p><b>Author:</b> garyohosu</p>"
-            "<p><b>GitHub:</b> <a href='https://github.com/garyohosu/CodexGUI'>"
-            "https://github.com/garyohosu/CodexGUI</a></p>"
+            tr("dialog.about_title"),
+            tr("dialog.about_text")
         )
     
     def _on_codex_help_clicked(self):
@@ -275,19 +289,46 @@ class MainWindow(QMainWindow):
         
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Codex CLI Installation Help")
-        msg_box.setText("How to install Codex CLI")
+        msg_box.setWindowTitle(tr("dialog.codex_help_title"))
+        msg_box.setText(tr("dialog.codex_help_text"))
         msg_box.setInformativeText(help_text)
         msg_box.setStandardButtons(QMessageBox.Ok)
         msg_box.exec()
+    
+    def _on_language_changed(self, language_code: str):
+        """Handle language change."""
+        # Save language preference
+        self.lang_manager.save_language_preference(language_code)
+        
+        # Show restart message
+        reply = QMessageBox.question(
+            self,
+            tr("dialog.restart_required_title"),
+            tr("dialog.restart_required_text"),
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No
+        )
+        
+        if reply == QMessageBox.Yes:
+            # Restart application
+            QCoreApplication.quit()
+            import sys
+            import os
+            os.execl(sys.executable, sys.executable, *sys.argv)
+        else:
+            QMessageBox.information(
+                self,
+                tr("dialog.restart_required_title"),
+                tr("dialog.restart_later_info")
+            )
     
     def closeEvent(self, event):
         """Handle window close event."""
         if self.worker and self.worker.isRunning():
             reply = QMessageBox.question(
                 self,
-                "Execution in Progress",
-                "A task is currently running. Are you sure you want to quit?",
+                tr("dialog.execution_in_progress_title"),
+                tr("dialog.execution_in_progress_text"),
                 QMessageBox.Yes | QMessageBox.No,
                 QMessageBox.No
             )
