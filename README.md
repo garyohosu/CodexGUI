@@ -17,6 +17,7 @@ CodexGUI provides a user-friendly graphical interface for OpenAI's Codex CLI, ma
 - **Real-time Output**: Live display of Codex CLI execution results
 - **Execution History**: Keep track of previous tasks and prompts
 - **Cross-platform**: Built with Qt/PySide6 for Windows, macOS, and Linux support
+- **Multilingual Support**: Switch between English and Japanese languages in the UI
 
 ## Architecture
 

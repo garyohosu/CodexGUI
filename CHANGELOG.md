@@ -5,6 +5,17 @@ All notable changes to CodexGUI will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Multilingual support with Language menu
+- English and Japanese translations for entire UI
+- i18n system with translation manager (core/i18n.py)
+- Translation files (i18n/en.json, i18n/ja.json)
+- Language preference saving and loading
+- Application restart support for language change
+- Translated template names and descriptions
+
 ## [0.0.1] - 2026-01-15
 
 ### Added
