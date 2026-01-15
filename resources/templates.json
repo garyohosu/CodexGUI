@@ -1,0 +1,74 @@
+{
+  "templates": [
+    {
+      "id": "file_organization",
+      "name": "File Organization",
+      "description": "Organize files in a folder by type and date",
+      "prompt": "Please organize the files in this folder by type and date. Create subfolders for different file types (documents, images, videos, etc.) and sort files chronologically.",
+      "category": "File Management"
+    },
+    {
+      "id": "business_card_extraction",
+      "name": "Business Card Data Extraction",
+      "description": "Extract information from business card images and create a spreadsheet",
+      "prompt": "Extract information from all business card images in this folder and create an Excel file with the following columns: Name, Name (Romaji), Company, Position, Phone, Email, and Image Filename. Process images in parallel if possible.",
+      "category": "Data Extraction"
+    },
+    {
+      "id": "code_analysis",
+      "name": "Code Analysis",
+      "description": "Analyze code structure and generate documentation",
+      "prompt": "Analyze the code in this repository and generate a comprehensive documentation including: 1) Project structure overview, 2) Main components and their purposes, 3) Key functions and classes, 4) Dependencies and their usage.",
+      "category": "Code Analysis"
+    },
+    {
+      "id": "receipt_expense",
+      "name": "Receipt to Expense Report",
+      "description": "Extract data from receipt images and create expense report",
+      "prompt": "Extract information from all receipt images in this folder and create an expense report with columns: Date, Vendor, Category, Amount, Payment Method, and Receipt Image. Calculate total expenses by category.",
+      "category": "Data Extraction"
+    },
+    {
+      "id": "document_summary",
+      "name": "Document Summary",
+      "description": "Summarize multiple documents into a single report",
+      "prompt": "Read all documents in this folder and create a comprehensive summary report highlighting: 1) Main topics covered, 2) Key points from each document, 3) Common themes, 4) Action items if any.",
+      "category": "Document Processing"
+    },
+    {
+      "id": "photo_organization",
+      "name": "Photo Organization",
+      "description": "Organize photos by date and event",
+      "prompt": "Organize photos in this folder by date and event. Create subfolders with descriptive names based on photo content and metadata. Rename files with meaningful names including date.",
+      "category": "File Management"
+    },
+    {
+      "id": "code_review",
+      "name": "Code Review",
+      "description": "Review code and provide suggestions",
+      "prompt": "Review the code in this folder and provide: 1) Code quality assessment, 2) Potential bugs or issues, 3) Performance optimization suggestions, 4) Best practices recommendations, 5) Security considerations.",
+      "category": "Code Analysis"
+    },
+    {
+      "id": "data_cleanup",
+      "name": "Data Cleanup",
+      "description": "Clean and standardize data files",
+      "prompt": "Clean and standardize all data files in this folder: 1) Remove duplicates, 2) Fix formatting issues, 3) Standardize field names, 4) Validate data consistency, 5) Generate a cleanup report.",
+      "category": "Data Processing"
+    },
+    {
+      "id": "meeting_notes",
+      "name": "Meeting Notes Summary",
+      "description": "Summarize meeting notes and extract action items",
+      "prompt": "Summarize all meeting notes in this folder and create a report with: 1) Key discussion points, 2) Decisions made, 3) Action items with owners, 4) Follow-up topics, 5) Timeline overview.",
+      "category": "Document Processing"
+    },
+    {
+      "id": "custom",
+      "name": "Custom Task",
+      "description": "Create your own custom prompt",
+      "prompt": "",
+      "category": "Custom"
+    }
+  ]
+}
