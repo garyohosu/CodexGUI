@@ -98,10 +98,12 @@ class CodexWrapper:
         try:
             # Build command - Use 'exec' with --yolo for full automation
             # --yolo enables complete non-interactive execution without prompts
+            # --skip-git-repo-check allows execution in non-git directories
             cmd = [
                 self.codex_path, 
                 "exec",
-                "--yolo",  # Full automation mode (bypass all confirmations)
+                "--yolo",                    # Full automation mode
+                "--skip-git-repo-check",     # Allow non-git directories
                 prompt
             ]
             
@@ -156,10 +158,12 @@ class CodexWrapper:
         try:
             # Build command - Use 'exec' with --yolo for full automation
             # --yolo enables complete non-interactive execution without prompts
+            # --skip-git-repo-check allows execution in non-git directories
             cmd = [
                 self.codex_path, 
                 "exec",
-                "--yolo",  # Full automation mode (bypass all confirmations)
+                "--yolo",                    # Full automation mode
+                "--skip-git-repo-check",     # Allow non-git directories
                 prompt
             ]
             cwd = working_dir or os.getcwd()
