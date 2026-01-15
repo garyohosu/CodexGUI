@@ -1,6 +1,10 @@
-# CodexGUI
+# CodexGUI v0.0.1
 
 A Qt/PySide6 GUI wrapper for OpenAI Codex CLI, enabling easy access to AI-powered code analysis, file organization, and task automation through an intuitive desktop interface.
+
+## Motivation
+
+After reading about Claude Code Work, I realized that many people find CLI (Command Line Interface) intimidating. This GUI wrapper makes Codex CLI accessible to everyone, regardless of their command-line experience.
 
 ## Overview
 

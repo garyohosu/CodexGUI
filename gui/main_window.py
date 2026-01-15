@@ -259,7 +259,7 @@ class MainWindow(QMainWindow):
         QMessageBox.about(
             self,
             "About CodexGUI",
-            "<h3>CodexGUI v1.0.0</h3>"
+            "<h3>CodexGUI v0.0.1</h3>"
             "<p>A Qt/PySide6 GUI wrapper for OpenAI Codex CLI</p>"
             "<p>Enables easy access to AI-powered code analysis, "
             "file organization, and task automation through an "
