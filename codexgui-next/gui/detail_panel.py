@@ -107,7 +107,7 @@ class DetailPanel(QWidget):
     def _append_colored(self, text: str, color: str):
         """Append colored text to execution log."""
         cursor = self.exec_log.textCursor()
-        cursor.movePosition(QTextCursor.End)
+        cursor.movePosition(QTextCursor.MoveOperation.End)
         
         html = f'<span style="color: {color};">{text}</span><br>'
         cursor.insertHtml(html)

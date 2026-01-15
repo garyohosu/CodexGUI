@@ -12,7 +12,7 @@ from PySide6.QtWidgets import (
     QPushButton, QLabel, QScrollArea, QFrame, QGridLayout
 )
 from PySide6.QtCore import Signal, Qt
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QFont, QTextCursor
 
 
 class TaskCard(QFrame):
@@ -303,7 +303,7 @@ class ChatPanel(QWidget):
         
         # Scroll to bottom
         cursor = self.chat_log.textCursor()
-        cursor.movePosition(cursor.End)
+        cursor.movePosition(QTextCursor.MoveOperation.End)
         self.chat_log.setTextCursor(cursor)
     
     def clear_chat(self):
