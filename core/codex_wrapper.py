@@ -97,8 +97,8 @@ class CodexWrapper:
         """
         try:
             # Build command - Use 'exec' for non-interactive execution
-            # --quiet/-q flag enables non-interactive mode
-            cmd = [self.codex_path, "exec", "--quiet", prompt]
+            # Options must come before the prompt
+            cmd = [self.codex_path, "exec", "-q", prompt]
             
             # Set working directory
             cwd = working_dir or os.getcwd()
@@ -150,7 +150,8 @@ class CodexWrapper:
         """
         try:
             # Build command - Use 'exec' for non-interactive execution
-            cmd = [self.codex_path, "exec", "--quiet", prompt]
+            # Options must come before the prompt
+            cmd = [self.codex_path, "exec", "-q", prompt]
             cwd = working_dir or os.getcwd()
             
             process = subprocess.Popen(
